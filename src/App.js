@@ -24,8 +24,15 @@ class App extends Component {
   // }
 
   addMeal(meal) {
-    console.log("adding", meal);
-    this.setState({ mealPlan: [...this.state.mealPlan, meal] });
+    const { mealPlan } = this.state;
+    if (mealPlan.find(({ id }) => id === meal.id)) {
+      return;
+    }
+    this.setState({ mealPlan: [...mealPlan, meal] });
+  }
+
+  removeMeal(id){
+    this.setState({ mealPlan: this.state.mealPlan.filter((meal) => meal.id !== id)});
   }
 
   render() {
@@ -34,7 +41,7 @@ class App extends Component {
       <div class="recipes">
         {recipes.map((recipe) => {
           return (
-            <Card style={{ width: "18rem" }}>
+            <Card style={{ margin: "5px" }}>
               <Card.Img variant="top" src={recipe.image} />
               <Card.Body>
                 <Card.Title>{recipe.title}</Card.Title>
@@ -60,7 +67,7 @@ class App extends Component {
               <Accordion.Body>
                 {mealPlan.map((meal) => {
                   return (
-                    <Toast>
+                    <Toast onClose={() => this.removeMeal(meal.id)}>
                       <Toast.Header>
                         <img
                           src="holder.js/20x20?text=%20"

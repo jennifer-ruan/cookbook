@@ -1,18 +1,21 @@
-import React, { Component } from 'react';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
+import React, { Component } from "react";
+import Accordion from "react-bootstrap/Accordion";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import Toast from "react-bootstrap/Toast";
 import "./App.css";
-import testRecipes from './mockdata';
+import testRecipes from "./mockdata";
 
-const apiKey = '92e57b4dba754a429e75213a195d43bc';
+const apiKey = "92e57b4dba754a429e75213a195d43bc";
 
 class App extends Component {
   state = {
     recipes: testRecipes,
-  }
+    mealPlan: [],
+  };
 
   // componentDidMount() {
-  //   fetch(`https://api.spoonacular.com/recipes/complexSearch?number=10&apiKey=${apiKey}`)
+  //   fetch(`https://api.spoonacular.com/recipes/complexSearch?number=10&addRecipeInformation=true&apiKey=${apiKey}`)
   //   .then(res => res.json())
   //   .then((data) => {
   //     this.setState({ recipes: data.results || [] })
@@ -20,42 +23,65 @@ class App extends Component {
   //   .catch(console.log)
   // }
 
+  addMeal(meal) {
+    console.log("adding", meal);
+    this.setState({ mealPlan: [...this.state.mealPlan, meal] });
+  }
+
   render() {
-  const {recipes} = this.state;
-  return (
-    <div>
-    {/* {recipes.map((recipe) => { return(
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">{recipe.title}</h5>
-          <h6 class="card-subtitle mb-2 text-muted">steve@apple.com</h6>
-          <img class="card-img-top" src={recipe.image}/>
+    const { mealPlan, recipes } = this.state;
+    return (
+      <div class="recipes">
+        {recipes.map((recipe) => {
+          return (
+            <Card style={{ width: "18rem" }}>
+              <Card.Img variant="top" src={recipe.image} />
+              <Card.Body>
+                <Card.Title>{recipe.title}</Card.Title>
+                <Card.Text></Card.Text>
+                <Button
+                  variant="dark"
+                  onClick={() =>
+                    this.addMeal({ id: recipe.id, title: recipe.title })
+                  }
+                >
+                  Add
+                </Button>
+                <Button variant="light">More Info</Button>
+              </Card.Body>
+            </Card>
+          );
+        })}
+
+        <div class="meals">
+          <Accordion defaultActiveKey="0">
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>Meal Plan</Accordion.Header>
+              <Accordion.Body>
+                {mealPlan.map((meal) => {
+                  return (
+                    <Toast>
+                      <Toast.Header>
+                        <img
+                          src="holder.js/20x20?text=%20"
+                          className="rounded me-2"
+                          alt=""
+                        />
+                        <strong className="me-auto">{meal.title}</strong>
+                        <small>11 mins ago</small>
+                      </Toast.Header>
+                      <Toast.Body>
+                        Hello, world! This is a toast message.
+                      </Toast.Body>
+                    </Toast>
+                  );
+                })}
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
         </div>
-      </div>)
-    })} */}
-
-<Form>
-      <Form.Group className="mb-3" controlId="formBasicEmail">
-        <Form.Label>Email address</Form.Label>
-        <Form.Control type="email" placeholder="Enter email" />
-        <Form.Text className="text-muted">
-          We'll never share your email with anyone else.
-        </Form.Text>
-      </Form.Group>
-
-      <Form.Group className="mb-3" controlId="formBasicPassword">
-        <Form.Label>Password</Form.Label>
-        <Form.Control type="password" placeholder="Password" />
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="formBasicCheckbox">
-        <Form.Check type="checkbox" label="Check me out" />
-      </Form.Group>
-      <Button variant="primary" type="submit">
-        Submit
-      </Button>
-    </Form>
-    </div>
-  );
+      </div>
+    );
   }
 }
 

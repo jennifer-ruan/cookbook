@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import Accordion from "react-bootstrap/Accordion";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
@@ -13,12 +12,40 @@ import testRecipes from "./mockdata";
 
 const apiKey = "92e57b4dba754a429e75213a195d43bc";
 
+function getNutrition(meal) {
+  const calories = meal.nutrition.nutrients.find(
+    ({ name }) => name === "Calories"
+  )
+    ? meal.nutrition.nutrients.find(({ name }) => name === "Calories").amount
+    : 0;
+  const fat = meal.nutrition.nutrients.find(({ name }) => name === "Fat")
+    ? meal.nutrition.nutrients.find(({ name }) => name === "Fat").amount
+    : 0;
+  const protein = meal.nutrition.nutrients.find(
+    ({ name }) => name === "Protein"
+  )
+    ? meal.nutrition.nutrients.find(({ name }) => name === "Protein").amount
+    : 0;
+  const carbs = meal.nutrition.nutrients.find(
+    ({ name }) => name === "Carbohydrates"
+  )
+    ? meal.nutrition.nutrients.find(({ name }) => name === "Carbohydrates")
+        .amount
+    : 0;
+
+  return {
+    calories,
+    fat,
+    protein,
+    carbs,
+  };
+}
+
 class App extends Component {
   state = {
     recipes: testRecipes,
     mealPlan: [],
-    minCalories: null,
-    maxCalories: null,
+    totalNutrition: { calories: 0, protein: 0, fat: 0, carbs: 0 },
   };
 
   // componentDidMount() {
@@ -31,11 +58,24 @@ class App extends Component {
   // }
 
   addMeal(meal) {
-    const { mealPlan } = this.state;
+    const { mealPlan, totalNutrition } = this.state;
+    console.log(meal);
     if (mealPlan.find(({ id }) => id === meal.id)) {
       return;
     }
-    this.setState({ mealPlan: [...mealPlan, meal] });
+
+    const addedNutrition = getNutrition(meal);
+
+    console.log(addedNutrition);
+    this.setState({
+      mealPlan: [...mealPlan, meal],
+      totalNutrition: {
+        protein: totalNutrition.protein + addedNutrition.protein,
+        fat: totalNutrition.fat + addedNutrition.fat,
+        carbs: totalNutrition.carbs + addedNutrition.carbs,
+        calories: totalNutrition.calories + addedNutrition.calories,
+      },
+    });
   }
 
   removeMeal(id) {
@@ -45,89 +85,127 @@ class App extends Component {
   }
 
   render() {
-    const { mealPlan, recipes } = this.state;
+    const { mealPlan, recipes, totalNutrition } = this.state;
     return (
       <Container fluid="xl">
         <Navbar bg="light">
           <Container fluid>
             <Navbar.Brand href="#">React Meal Planner</Navbar.Brand>
             <Navbar.Toggle aria-controls="navbarScroll" />
-            <Navbar.Collapse id="navbarScroll">
-              <Form className="d-flex">
-                <Form.Control
-                  type="weight"
-                  placeholder="Weight"
-                  className="me-2"
-                  aria-label="Weight"
-                />
-                <Form.Control
-                  type="height"
-                  placeholder="Height"
-                  className="me-2"
-                  aria-label="Height"
-                />
-                <Button variant="outline-success">Calculate</Button>
-              </Form>
-            </Navbar.Collapse>
+            <Navbar.Collapse id="navbarScroll"></Navbar.Collapse>
           </Container>
         </Navbar>
 
         <Row>
-          <div class="recipes">
-            {recipes.map((recipe) => {
-              return (
-                <Card style={{ margin: "5px" }}>
-                  <Card.Img variant="top" src={recipe.image} />
-                  <Card.Body>
-                    <Card.Title>{recipe.title}</Card.Title>
-                    <Card.Text></Card.Text>
-                    <Button variant="dark" onClick={() => this.addMeal(recipe)}>
-                      Add
-                    </Button>
-                    <Button variant="light">More Info</Button>
-                  </Card.Body>
-                </Card>
-              );
-            })}
-          </div>
+          <Col lg="10">
+            <div class="recipes">
+              {recipes.map((recipe) => {
+                return (
+                  <Card style={{ margin: "5px" }}>
+                    <Card.Img variant="top" src={recipe.image} />
+                    <Card.Body>
+                      <Card.Title>{recipe.title}</Card.Title>
+                      <Card.Text></Card.Text>
+                      <Button
+                        variant="dark"
+                        onClick={() => this.addMeal(recipe)}
+                      >
+                        Add
+                      </Button>
+                      <Button variant="light">More Info</Button>
+                    </Card.Body>
+                  </Card>
+                );
+              })}
+            </div>
+          </Col>
+
+          <Col>
+            <div class="meals">
+              <Container>
+                <Row>
+                  {mealPlan.map((meal) => {
+                    return (
+                      <Toast
+                        onClose={() => this.removeMeal(meal.id)}
+                        style={{ marginBottom: "5px" }}
+                      >
+                        <Toast.Header>
+                          <img
+                            src="holder.js/20x20?text=%20"
+                            className="rounded me-2"
+                            alt=""
+                          />
+                          <strong className="me-auto">{meal.title}</strong>
+                          <small>
+                            {
+                              meal.nutrition.nutrients.find(
+                                ({ name }) => name === "Calories"
+                              ).amount
+                            }{" "}
+                            kcal
+                          </small>
+                        </Toast.Header>
+                        <Toast.Body>
+                          Hello, world! This is a toast message.
+                        </Toast.Body>
+                      </Toast>
+                    );
+                  })}
+                </Row>
+                <Row>
+                  <div class="nutrition">
+                    Calories: {totalNutrition.calories} cal
+                    <br />
+                    Protein: {totalNutrition.protein} g
+                    <br />
+                    Fat: {totalNutrition.fat} g
+                    <br />
+                    Carbs: {totalNutrition.carbs} g
+                  </div>
+                </Row>
+              </Container>
+            </div>
+          </Col>
         </Row>
 
-        <div class="meals">
-          <Accordion defaultActiveKey="0">
-            <Accordion.Item eventKey="0">
-              <Accordion.Header>Meal Plan</Accordion.Header>
-              <Accordion.Body>
-                {mealPlan.map((meal) => {
-                  return (
-                    <Toast
-                      onClose={() => this.removeMeal(meal.id)}
-                      style={{ marginBottom: "5px" }}
-                    >
-                      <Toast.Header>
-                        <img
-                          src="holder.js/20x20?text=%20"
-                          className="rounded me-2"
-                          alt=""
-                        />
-                        <strong className="me-auto">{meal.title}</strong>
-                        <small>
-                          {
-                            meal.nutrition.nutrients.find(
-                              ({ name }) => name === "Calories"
-                            ).amount
-                          }{" "}
-                          kcal
-                        </small>
-                      </Toast.Header>
-                      <Toast.Body>
-                        Hello, world! This is a toast message.
-                      </Toast.Body>
-                    </Toast>
-                  );
-                })}
-              </Accordion.Body>
-            </Accordion.Item>
-          </Accordion>
+        <div class="form">
+          <Form className="d-flex">
+            <Form.Group controlId="validationCustom01">
+              <Form.Control
+                required
+                type="weight"
+                placeholder="Weight"
+                className="me-2"
+                aria-label="Weight"
+              />
+            </Form.Group>
+            <Form.Group controlId="validationCustom02">
+              <Form.Control
+                required
+                type="height"
+                placeholder="Height"
+                className="me-2"
+                aria-label="Height"
+              />
+            </Form.Group>
+            <Form.Group controlId="validationCustom03">
+              <Form.Select required>
+                <option>Male</option>
+                <option>Female</option>
+              </Form.Select>
+            </Form.Group>
+            <Form.Group controlId="validaionCustom04">
+              <Form.Control
+                required
+                type="age"
+                placeholder="Age"
+                className="me-2"
+                aria-label="Age"
+              />
+            </Form.Group>
+            <Button variant="outline-success">Calculate</Button>
+          </Form>
         </div>
       </Container>
     );

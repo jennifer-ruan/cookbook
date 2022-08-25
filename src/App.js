@@ -5,6 +5,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
+import Modal from "react-bootstrap/Modal";
 import Navbar from "react-bootstrap/Navbar";
 import Toast from "react-bootstrap/Toast";
 import "./App.css";
@@ -46,6 +47,8 @@ class App extends Component {
     recipes: testRecipes,
     mealPlan: [],
     totalNutrition: { calories: 0, protein: 0, fat: 0, carbs: 0 },
+    maxCalories: null,
+    showForm: true,
   };
 
   // componentDidMount() {
@@ -66,7 +69,6 @@ class App extends Component {
 
     const addedNutrition = getNutrition(meal);
 
-    console.log(addedNutrition);
     this.setState({
       mealPlan: [...mealPlan, meal],
       totalNutrition: {
@@ -79,13 +81,28 @@ class App extends Component {
   }
 
   removeMeal(id) {
+    const { mealPlan, totalNutrition } = this.state;
+
+    const nutrition = getNutrition(mealPlan.find((meal) => meal.id === id));
+
     this.setState({
-      mealPlan: this.state.mealPlan.filter((meal) => meal.id !== id),
+      mealPlan: mealPlan.filter((meal) => meal.id !== id),
+      totalNutrition: {
+        protein: totalNutrition.protein - nutrition.protein,
+        fat: totalNutrition.fat - nutrition.fat,
+        carbs: totalNutrition.carbs - nutrition.carbs,
+        calories: totalNutrition.calories - nutrition.calories,
+      },
     });
   }
 
+  setMaxCalories() {}
+
   render() {
-    const { mealPlan, recipes, totalNutrition } = this.state;
+    const { mealPlan, recipes, totalNutrition, maxCalories, showForm } =
+      this.state;
+
+    console.log(showForm);
     return (
       <Container fluid="xl">
         <Navbar bg="light">
@@ -154,59 +171,75 @@ class App extends Component {
                   })}
                 </Row>
                 <Row>
-                  <div class="nutrition">
-                    Calories: {totalNutrition.calories} cal
-                    <br />
-                    Protein: {totalNutrition.protein} g
-                    <br />
-                    Fat: {totalNutrition.fat} g
-                    <br />
-                    Carbs: {totalNutrition.carbs} g
-                  </div>
+                  <Toast>
+                    <Toast.Header closeButton={false}>
+                      {maxCalories ? (
+                        <h6>{maxCalories - totalNutrition.calories} cal left</h6>
+                      ) : (
+                        <Button
+                          onClick={() => this.setState({ showForm: true })}
+                        >
+                          Calculate Your Intake
+                        </Button>
+                      )}
+                    </Toast.Header>
+                    <Toast.Body>
+                      <b>Calories:</b> {totalNutrition.calories} cal
+                      <br />
+                      <b>Protein:</b> {totalNutrition.protein} g
+                      <br />
+                      <b>Fat:</b> {totalNutrition.fat} g
+                      <br />
+                      <b>Carbs:</b> {totalNutrition.carbs} g
+                    </Toast.Body>
+                  </Toast>
                 </Row>
               </Container>
             </div>
           </Col>
         </Row>
 
-        <div class="form">
-          <Form className="d-flex">
-            <Form.Group controlId="validationCustom01">
-              <Form.Control
-                required
-                type="weight"
-                placeholder="Weight"
-                className="me-2"
-                aria-label="Weight"
-              />
-            </Form.Group>
-            <Form.Group controlId="validationCustom02">
-              <Form.Control
-                required
-                type="height"
-                placeholder="Height"
-                className="me-2"
-                aria-label="Height"
-              />
-            </Form.Group>
-            <Form.Group controlId="validationCustom03">
-              <Form.Select required>
-                <option>Male</option>
-                <option>Female</option>
-              </Form.Select>
-            </Form.Group>
-            <Form.Group controlId="validaionCustom04">
-              <Form.Control
-                required
-                type="age"
-                placeholder="Age"
-                className="me-2"
-                aria-label="Age"
-              />
-            </Form.Group>
-            <Button variant="outline-success">Calculate</Button>
-          </Form>
-        </div>
+        <Modal show={showForm}>
+          <Modal.Header><Button onClick={() => this.setState({showForm: false})}>x</Button></Modal.Header>
+          <div class="form">
+            <Form className="d-flex">
+              <Form.Group controlId="validationCustom01">
+                <Form.Control
+                  required
+                  type="weight"
+                  placeholder="Weight"
+                  className="me-2"
+                  aria-label="Weight"
+                />
+              </Form.Group>
+              <Form.Group controlId="validationCustom02">
+                <Form.Control
+                  required
+                  type="height"
+                  placeholder="Height"
+                  className="me-2"
+                  aria-label="Height"
+                />
+              </Form.Group>
+              <Form.Group controlId="validationCustom03">
+                <Form.Select required>
+                  <option>Male</option>
+                  <option>Female</option>
+                </Form.Select>
+              </Form.Group>
+              <Form.Group controlId="validaionCustom04">
+                <Form.Control
+                  required
+                  type="age"
+                  placeholder="Age"
+                  className="me-2"
+                  aria-label="Age"
+                />
+              </Form.Group>
+              <Button variant="outline-success">Calculate</Button>
+            </Form>
+          </div>
+        </Modal>
       </Container>
     );
   }

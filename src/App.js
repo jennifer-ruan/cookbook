@@ -7,6 +7,7 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import Navbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
 import Toast from "react-bootstrap/Toast";
 import "./App.css";
 import testRecipes from "./mockdata";
@@ -48,7 +49,12 @@ class App extends Component {
     mealPlan: [],
     totalNutrition: { calories: 0, protein: 0, fat: 0, carbs: 0 },
     maxCalories: null,
-    showForm: true,
+    showForm: false,
+    height: null,
+    weight: null,
+    age: null,
+    gender: "male",
+    goal: 0,
   };
 
   // componentDidMount() {
@@ -62,7 +68,6 @@ class App extends Component {
 
   addMeal(meal) {
     const { mealPlan, totalNutrition } = this.state;
-    console.log(meal);
     if (mealPlan.find(({ id }) => id === meal.id)) {
       return;
     }
@@ -96,151 +101,236 @@ class App extends Component {
     });
   }
 
-  setMaxCalories() {}
+  handleSubmit(e) {
+    e.preventDefault();
+    const { weight, height, age, gender, goal } = this.state;
+
+    let calorieGoal = null;
+
+    if (gender === "male") {
+      calorieGoal =
+        10 * (weight / 2.205) + 6.25 * height - 5 * age + 5 + 500 * goal;
+    } else {
+      calorieGoal =
+        10 * (weight / 2.205) + 6.25 * height - 5 * age - 161 + 500 * goal;
+    }
+
+    this.setState({ maxCalories: calorieGoal, showForm: false });
+  }
 
   render() {
     const { mealPlan, recipes, totalNutrition, maxCalories, showForm } =
       this.state;
 
-    console.log(showForm);
+    const { weight, height, age, gender, goal } = this.state;
+    console.log(weight, height, age, gender, goal);
+
     return (
-      <Container fluid="xl">
-        <Navbar bg="light">
+      <div>
+        <Navbar>
           <Container fluid>
-            <Navbar.Brand href="#">React Meal Planner</Navbar.Brand>
-            <Navbar.Toggle aria-controls="navbarScroll" />
-            <Navbar.Collapse id="navbarScroll"></Navbar.Collapse>
+            <Navbar.Brand href="#" id="title">
+              MEAL PLANNER
+            </Navbar.Brand>
+            <Nav>
+              <Nav.Link href="#my-website" id="credit">
+                Jenn Ruan
+              </Nav.Link>
+            </Nav>
           </Container>
         </Navbar>
-
-        <Row>
-          <Col lg="10">
-            <div class="recipes">
-              {recipes.map((recipe) => {
-                return (
-                  <Card style={{ margin: "5px" }}>
-                    <Card.Img variant="top" src={recipe.image} />
-                    <Card.Body>
-                      <Card.Title>{recipe.title}</Card.Title>
-                      <Card.Text></Card.Text>
-                      <Button
-                        variant="dark"
-                        onClick={() => this.addMeal(recipe)}
-                      >
-                        Add
-                      </Button>
-                      <Button variant="light">More Info</Button>
-                    </Card.Body>
-                  </Card>
-                );
-              })}
-            </div>
-          </Col>
-
-          <Col>
-            <div class="meals">
-              <Container>
-                <Row>
-                  {mealPlan.map((meal) => {
-                    return (
-                      <Toast
-                        onClose={() => this.removeMeal(meal.id)}
-                        style={{ marginBottom: "5px" }}
-                      >
-                        <Toast.Header>
-                          <img
-                            src="holder.js/20x20?text=%20"
-                            className="rounded me-2"
-                            alt=""
-                          />
-                          <strong className="me-auto">{meal.title}</strong>
-                          <small>
-                            {
-                              meal.nutrition.nutrients.find(
-                                ({ name }) => name === "Calories"
-                              ).amount
-                            }{" "}
-                            kcal
-                          </small>
-                        </Toast.Header>
-                        <Toast.Body>
-                          Hello, world! This is a toast message.
-                        </Toast.Body>
-                      </Toast>
-                    );
-                  })}
-                </Row>
-                <Row>
-                  <Toast>
-                    <Toast.Header closeButton={false}>
-                      {maxCalories ? (
-                        <h6>{maxCalories - totalNutrition.calories} cal left</h6>
-                      ) : (
+        <Container fluid="xl">
+          <Row>
+            <Col xl="10" lg="9" md="8">
+              <div class="recipes">
+                {recipes.map((recipe) => {
+                  return (
+                    <Card style={{ margin: "5px" }}>
+                      <Card.Img variant="top" src={recipe.image} />
+                      <Card.Body>
+                        <Card.Title>{recipe.title}</Card.Title>
+                        <Card.Text></Card.Text>
                         <Button
-                          onClick={() => this.setState({ showForm: true })}
+                          variant="dark"
+                          onClick={() => this.addMeal(recipe)}
                         >
-                          Calculate Your Intake
+                          Add
                         </Button>
-                      )}
-                    </Toast.Header>
-                    <Toast.Body>
-                      <b>Calories:</b> {totalNutrition.calories} cal
-                      <br />
-                      <b>Protein:</b> {totalNutrition.protein} g
-                      <br />
-                      <b>Fat:</b> {totalNutrition.fat} g
-                      <br />
-                      <b>Carbs:</b> {totalNutrition.carbs} g
-                    </Toast.Body>
-                  </Toast>
-                </Row>
-              </Container>
-            </div>
-          </Col>
-        </Row>
+                        <Button variant="light">More Info</Button>
+                      </Card.Body>
+                    </Card>
+                  );
+                })}
+              </div>
+            </Col>
 
-        <Modal show={showForm}>
-          <Modal.Header><Button onClick={() => this.setState({showForm: false})}>x</Button></Modal.Header>
-          <div class="form">
-            <Form className="d-flex">
-              <Form.Group controlId="validationCustom01">
-                <Form.Control
-                  required
-                  type="weight"
-                  placeholder="Weight"
-                  className="me-2"
-                  aria-label="Weight"
-                />
-              </Form.Group>
-              <Form.Group controlId="validationCustom02">
-                <Form.Control
-                  required
-                  type="height"
-                  placeholder="Height"
-                  className="me-2"
-                  aria-label="Height"
-                />
-              </Form.Group>
-              <Form.Group controlId="validationCustom03">
-                <Form.Select required>
-                  <option>Male</option>
-                  <option>Female</option>
-                </Form.Select>
-              </Form.Group>
-              <Form.Group controlId="validaionCustom04">
-                <Form.Control
-                  required
-                  type="age"
-                  placeholder="Age"
-                  className="me-2"
-                  aria-label="Age"
-                />
-              </Form.Group>
-              <Button variant="outline-success">Calculate</Button>
-            </Form>
-          </div>
-        </Modal>
-      </Container>
+            <Col>
+              <div class="meals">
+                <Container>
+                  <Row>
+                    {mealPlan.map((meal) => {
+                      return (
+                        <Toast
+                          onClose={() => this.removeMeal(meal.id)}
+                          style={{ marginBottom: "5px" }}
+                        >
+                          <Toast.Header>
+                            <img
+                              src="holder.js/20x20?text=%20"
+                              className="rounded me-2"
+                              alt=""
+                            />
+                            <strong className="me-auto">{meal.title}</strong>
+                            <small>
+                              {
+                                meal.nutrition.nutrients.find(
+                                  ({ name }) => name === "Calories"
+                                ).amount
+                              }{" "}
+                              kcal
+                            </small>
+                          </Toast.Header>
+                          <Toast.Body>
+                            Hello, world! This is a toast message.
+                          </Toast.Body>
+                        </Toast>
+                      );
+                    })}
+                  </Row>
+                  <Row>
+                    <Toast>
+                      <Toast.Header closeButton={false}>
+                        {maxCalories ? (
+                          <h6>
+                            {maxCalories - totalNutrition.calories} cal left
+                          </h6>
+                        ) : (
+                          <Button
+                            onClick={() => this.setState({ showForm: true })}
+                          >
+                            Calculate Your Intake
+                          </Button>
+                        )}
+                      </Toast.Header>
+                      <Toast.Body>
+                        <b>Calories:</b> {totalNutrition.calories} cal
+                        <br />
+                        <b>Protein:</b> {totalNutrition.protein} g
+                        <br />
+                        <b>Fat:</b> {totalNutrition.fat} g
+                        <br />
+                        <b>Carbs:</b> {totalNutrition.carbs} g
+                      </Toast.Body>
+                    </Toast>
+                  </Row>
+                </Container>
+              </div>
+            </Col>
+          </Row>
+
+          <Modal show={showForm}>
+            <div class="form">
+              <Form className="d-flex" onSubmit={this.handleSubmit.bind(this)}>
+                <Container>
+                  <Row className="mb-3">
+                    <Form.Group controlId="validationCustom01">
+                      <Form.Control
+                        required
+                        type="weight"
+                        placeholder="Weight (lbs)"
+                        className="me-2"
+                        aria-label="Weight"
+                        value={weight}
+                        onChange={(e) => {
+                          this.setState({ weight: e.target.value });
+                        }}
+                      />
+                    </Form.Group>
+                  </Row>
+                  <Row className="mb-3">
+                    <Form.Group controlId="validationCustom02">
+                      <Form.Control
+                        required
+                        type="height"
+                        placeholder="Height (cm)"
+                        className="me-2"
+                        aria-label="Height"
+                        value={height}
+                        onChange={(e) => {
+                          this.setState({ height: e.target.value });
+                        }}
+                      />
+                    </Form.Group>
+                  </Row>
+                  <Row className="mb-3">
+                    <Col xs={6}>
+                      <Form.Group controlId="validationCustom03">
+                        <Form.Select
+                          required
+                          value={gender}
+                          onChange={(e) => {
+                            this.setState({ gender: e.target.value });
+                          }}
+                        >
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                    <Col>
+                      <Form.Group controlId="validaionCustom04">
+                        <Form.Control
+                          required
+                          type="age"
+                          placeholder="Age"
+                          className="me-2"
+                          aria-label="Age"
+                          value={age}
+                          onChange={(e) => {
+                            this.setState({ age: e.target.value });
+                          }}
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row className="mb-3">
+                    <Form.Group controlId="validationCustom05">
+                      <Form.Select
+                        required
+                        value={goal}
+                        onChange={(e) => {
+                          this.setState({ goal: e.target.value });
+                        }}
+                      >
+                        <option value="0">Maintain my current weight</option>
+                        <option value="2">Gain 2lb/week</option>
+                        <option value="1">Gain 1lb/week</option>
+                        <option value="0.5">Gain 0.5lb/week</option>
+                        <option value="-0.5">Lose 0.5lb/week</option>
+                        <option value="-1">Lose 1lb/week</option>
+                        <option value="-2">Lose 2lb/week</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <Button
+                        variant="outline-secondary"
+                        onClick={() => this.setState({ showForm: false })}
+                      >
+                        Close
+                      </Button>
+                      <Button variant="outline-dark" type="submit">
+                        Calculate
+                      </Button>
+                    </Col>
+                  </Row>
+                </Container>
+              </Form>
+            </div>
+          </Modal>
+        </Container>
+      </div>
     );
   }
 }

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400&family=Josefin+Sans:wght@300;600&display=swap');
+
 .App {
   text-align: center;
 }
@@ -5,6 +7,10 @@
 .recipes {
   display: grid;
   grid-template-columns: auto auto auto auto;
+  background-color: #fca311;
+  padding: 10px;
+  border-radius: 32% 68% 72% 28% / 30% 30% 70% 70%;
+  font-family: 'DM Sans', sans-serif;
 }
 
 .meals {
@@ -19,4 +25,15 @@
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
   border-radius: 5px;
   border-color: #e5e5e5;
+}
+
+.form{
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+#title {
+  font-family: 'Josefin Sans', sans-serif;
+  font-weight: 600;
+  font-size: 36px;
 }

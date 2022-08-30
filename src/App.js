@@ -129,14 +129,14 @@ class App extends Component {
       <div>
         <Navbar>
           <Container fluid>
-            <Navbar.Brand href="#" id="title">
-              MEAL PLANNER
-            </Navbar.Brand>
-            <Nav>
-              <Nav.Link href="#my-website" id="credit">
-                Jenn Ruan
-              </Nav.Link>
-            </Nav>
+            <Row className="m-auto">
+              <Navbar.Brand href="#" id="title">
+                MEAL PLANNER{" "}
+                <span id="my-website">
+                  by <a href="my-website">Jenn Ruan</a>
+                </span>
+              </Navbar.Brand>
+            </Row>
           </Container>
         </Navbar>
         <Container fluid="xl">
@@ -145,20 +145,26 @@ class App extends Component {
               <div class="recipes">
                 {recipes.map((recipe) => {
                   return (
-                    <Card style={{ margin: "5px" }}>
-                      <Card.Img variant="top" src={recipe.image} />
-                      <Card.Body>
-                        <Card.Title>{recipe.title}</Card.Title>
-                        <Card.Text></Card.Text>
-                        <Button
-                          variant="dark"
-                          onClick={() => this.addMeal(recipe)}
-                        >
-                          Add
-                        </Button>
-                        <Button variant="light">More Info</Button>
-                      </Card.Body>
-                    </Card>
+                    <div class="square">
+                      <img class="square-img" src={recipe.image}></img>
+                      <div class="square-title">{recipe.title}</div>
+                      <div class="square-overlay"></div>
+                    </div>
+                    // <Card>
+                    //   <Card.Img variant="top" src={recipe.image} />
+                    //   <Card.Body>
+                    //     <Card.Title>{recipe.title}</Card.Title>
+                    //     <Card.Text></Card.Text>
+                    //     <Button
+                    //       variant="dark"
+                    //       onClick={() => this.addMeal(recipe)}
+                    //       style={{ marginRight: "3px" }}
+                    //     >
+                    //       Add
+                    //     </Button>
+                    //     <Button variant="light">More Info</Button>
+                    //   </Card.Body>
+                    // </Card>
                   );
                 })}
               </div>

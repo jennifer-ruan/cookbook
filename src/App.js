@@ -148,7 +148,32 @@ class App extends Component {
                     <div class="square">
                       <img class="square-img" src={recipe.image}></img>
                       <div class="square-title">{recipe.title}</div>
-                      <div class="square-overlay"></div>
+                      <div class="square-overlay">
+                        <Container>
+                          <Row>
+                            <div class="square-text">
+                              {getNutrition(recipe).calories} calories
+                              <br />
+                              {getNutrition(recipe).protein}g protein
+                              <br />
+                              {getNutrition(recipe).fat}g fat
+                              <br />
+                              {getNutrition(recipe).carbs}g carbs
+                            </div>
+                          </Row>
+                          <Row>
+                            <button
+                              class="square-button"
+                              onClick={() => this.addMeal(recipe)}
+                            >
+                              <i class="fa-solid fa-plus fa-xl"></i>
+                            </button>
+                            <button class="square-button">
+                              <i class="fa-solid fa-ellipsis fa-xl"></i>
+                            </button>
+                          </Row>
+                        </Container>
+                      </div>
                     </div>
                     // <Card>
                     //   <Card.Img variant="top" src={recipe.image} />

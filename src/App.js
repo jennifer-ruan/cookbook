@@ -150,28 +150,32 @@ class App extends Component {
                       <div class="square-title">{recipe.title}</div>
                       <div class="square-overlay">
                         <Container>
-                          <Row>
-                            <div class="square-text">
-                              {getNutrition(recipe).calories} calories
-                              <br />
-                              {getNutrition(recipe).protein}g protein
-                              <br />
-                              {getNutrition(recipe).fat}g fat
-                              <br />
-                              {getNutrition(recipe).carbs}g carbs
-                            </div>
-                          </Row>
-                          <Row>
-                            <button
-                              class="square-button"
-                              onClick={() => this.addMeal(recipe)}
-                            >
-                              <i class="fa-solid fa-plus fa-xl"></i>
-                            </button>
-                            <button class="square-button">
-                              <i class="fa-solid fa-ellipsis fa-xl"></i>
-                            </button>
-                          </Row>
+                          <div class="overlay-content">
+                            <Row>
+                              <div class="square-text">
+                                {getNutrition(recipe).calories} calories
+                                <br />
+                                {getNutrition(recipe).protein}g protein
+                                <br />
+                                {getNutrition(recipe).fat}g fat
+                                <br />
+                                {getNutrition(recipe).carbs}g carbs
+                              </div>
+                            </Row>
+                            <Row>
+                              <div class="square-btns">
+                                <button
+                                  class="square-button"
+                                  onClick={() => this.addMeal(recipe)}
+                                >
+                                  <i class="fa-solid fa-plus fa-xl"></i>
+                                </button>
+                                <button class="square-button">
+                                  <i class="fa-solid fa-ellipsis fa-xl"></i>
+                                </button>
+                              </div>
+                            </Row>
+                          </div>
                         </Container>
                       </div>
                     </div>
@@ -221,9 +225,6 @@ class App extends Component {
                               kcal
                             </small>
                           </Toast.Header>
-                          <Toast.Body>
-                            Hello, world! This is a toast message.
-                          </Toast.Body>
                         </Toast>
                       );
                     })}
@@ -231,11 +232,7 @@ class App extends Component {
                   <Row>
                     <Toast>
                       <Toast.Header closeButton={false}>
-                        {maxCalories ? (
-                          <h6>
-                            {maxCalories - totalNutrition.calories} cal left
-                          </h6>
-                        ) : (
+                        {!maxCalories && (
                           <Button
                             onClick={() => this.setState({ showForm: true })}
                           >
@@ -244,13 +241,15 @@ class App extends Component {
                         )}
                       </Toast.Header>
                       <Toast.Body>
-                        <b>Calories:</b> {totalNutrition.calories} cal
+                        <b>Calories:</b> {Math.round(totalNutrition.calories)} cal {maxCalories && (
+                            <p>/{Math.round(maxCalories)} cal</p>
+                        )}
                         <br />
-                        <b>Protein:</b> {totalNutrition.protein} g
+                        <b>Protein:</b> {0 || Math.round(totalNutrition.protein)} g
                         <br />
-                        <b>Fat:</b> {totalNutrition.fat} g
+                        <b>Fat:</b> {0 || Math.round(totalNutrition.fat)} g
                         <br />
-                        <b>Carbs:</b> {totalNutrition.carbs} g
+                        <b>Carbs:</b> {0 ||Math.round(totalNutrition.carbs)} g
                       </Toast.Body>
                     </Toast>
                   </Row>
